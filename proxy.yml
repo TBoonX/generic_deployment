@@ -1,0 +1,71 @@
+version: "3.8"
+
+services:
+    webserver: # Reverse proxy
+        image: jwilder/nginx-proxy:latest
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+        networks:
+            - sub
+        environment:
+             - DHPARAM_GENERATION=false
+        volumes:
+            - /var/run/docker.sock:/tmp/docker.sock:ro
+            - certs:/etc/nginx/certs:ro
+            - vhost:/etc/nginx/vhost.d
+            - html:/usr/share/nginx/html
+        labels:
+            com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: ""
+        logging:
+            driver: "json-file"
+            options:
+                max-file: "3"
+                max-size: "10m"
+
+    letsencrypt: # Let's encrypt part which interacts with webserver and docker engine
+        image: jrcs/letsencrypt-nginx-proxy-companion
+        restart: always
+        networks:
+            - sub
+        environment:
+            - DEFAULT_EMAIL=${LE_DEFAULT_EMAIL}
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - certs:/etc/nginx/certs:rw
+            - vhost:/etc/nginx/vhost.d
+            - html:/usr/share/nginx/html
+        logging:
+            driver: "json-file"
+            options:
+                max-file: "1"
+                max-size: "1m"
+                
+                
+    webhook:
+        image: almir/webhook
+        command: -verbose -hooks=/opt/webhook/webhook.json -hotreload -port 80
+        networks:
+            - sub
+        expose:
+            - "80"
+        volumes:
+            - ./:/opt/webhook
+        environment:
+            - VIRTUAL_HOST=webhook.${BASE_DOMAIN}
+            - LETSENCRYPT_HOST=webhook.${BASE_DOMAIN}
+            - LETSENCRYPT_EMAIL=${LE_DEFAULT_EMAIL}
+        logging:
+            driver: "json-file"
+            options:
+                max-file: "1"
+                max-size: "1m"
+
+volumes:
+    certs:
+    vhost:
+    html:
+
+networks:
+    sub: 

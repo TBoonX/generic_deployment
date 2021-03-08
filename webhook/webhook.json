@@ -1,0 +1,32 @@
+[
+   {
+      "id":"redeploy",
+      "execute-command":"/bin/sh",
+      "command-working-directory":"./",
+      "response-message":"Redeploying ...",
+      "pass-arguments-to-command":[
+         {
+            "source":"string",
+            "name":"/opt/webhook/hook_script.sh"
+         },
+         {
+            "source":"payload",
+            "name":"deploy"
+         }
+      ],
+      "trigger-rule":{
+         "and":[
+            {
+               "match":{
+                  "type":"value",
+                  "value":"secret",
+                  "parameter":{
+                     "source":"header",
+                     "name":"Authorization"
+                  }
+               }
+            }
+         ]
+      }
+   }
+]
