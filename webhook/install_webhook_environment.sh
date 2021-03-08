@@ -1,8 +1,5 @@
 #!/bin/bash
 
-#apt-get update
-#apt-get install -y webhook # Docker Container is used
-
 mkdir -p /opt/webhook/pipe
 mkfifo /opt/webhook/pipe/host_executor_queue
 

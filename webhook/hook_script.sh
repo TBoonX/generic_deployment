@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#wall "Test: webhook is working"
+wall "Test: webhook is working"
 
 pipe=/opt/webhook/pipe/host_executor_queue
 

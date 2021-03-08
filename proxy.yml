@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-    webserver: # Reverse proxy
+    proxy-server: # Reverse proxy
         image: jwilder/nginx-proxy:latest
         restart: always
         ports:
@@ -24,7 +24,7 @@ services:
                 max-file: "3"
                 max-size: "10m"
 
-    letsencrypt: # Let's encrypt part which interacts with webserver and docker engine
+    proxy-letsencrypt: # Let's encrypt part which interacts with webserver and docker engine
         image: jrcs/letsencrypt-nginx-proxy-companion
         restart: always
         networks:
@@ -43,7 +43,7 @@ services:
                 max-size: "1m"
                 
                 
-    webhook:
+    proxy-webhook:
         image: almir/webhook
         command: -verbose -hooks=/opt/webhook/webhook.json -hotreload -port 80
         networks:
